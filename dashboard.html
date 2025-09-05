@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insecure2Secure - Moderator Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a5acd;
+            --secondary: #ff7e5f;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--primary);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu li:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar-menu i {
+            width: 20px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .welcome {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-title {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .card-value .fa-spinner {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .card-value .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+        }
+        
+        /* Tables */
+        .table-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a4abc;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background: #e8f5e9;
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .status-failed {
+            background: #ffebee;
+            color: var(--danger);
+        }
+        
+        .status-refunded {
+            background: #e3f2fd;
+            color: #007bff;
+        }
+        
+        .status-processing {
+            background: #f3e5f5;
+            color: #9c27b0;
+        }
+        
+        /* Customer Care Styles */
+        .contact-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .contact-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .contact-stats i {
+            color: var(--primary);
+        }
+
+        .inquiry-tabs {
+            margin: 20px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--dark);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        /* Status colors for inquiries */
+        .status-new {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-inprogress {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-resolved {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 20px;
+            color: var(--primary);
+        }
+        
+        .loading-state i {
+            margin-right: 10px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 20px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            body {
+                flex-direction: column;
+            }
+        }
+
+        @keyframes highlightSection {
+            0% { background-color: rgba(106, 90, 205, 0.1); }
+            100% { background-color: white; }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+        }
+
+        .user-count {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .btn-view {
+            background: var(--primary);
+            color: white;
+        }
+
+        .user-detail {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-detail:last-child {
+            border-bottom: none;
+        }
+
+        .user-detail strong {
+            color: var(--primary);
+            display: inline-block;
+            width: 140px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 4px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-approve {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-reject {
+            background: var(--danger);
+            color: white;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .user-info {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .access-duration {
+            margin: 20px 0;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-inactive {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-img">I2S</div>
+            <div class="logo-text">Insecure2Secure</div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#paymentsSection" onclick="scrollToPayments(event)"><i class="fas fa-money-bill-wave"></i> Payments</a></li>
+            <li><a href="#usersSection" onclick="scrollToUsers(event)"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="#contentSection" onclick="scrollToContent(event)"><i class="fas fa-file-upload"></i> Content</a></li>
+            <li><a href="#customerCareSection" onclick="scrollToCustomerCare(event)"><i class="fas fa-headset"></i> Customer Care</a></li>
+            <li><a href="index.html"><i class="fas fa-globe"></i> View Website</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="dashboard-header">
+            <div class="welcome">Welcome, Moderator!</div>
+            <div class="user-info">
+                <i class="fas fa-bell"></i>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <div class="card" id="totalUsersCard">
+                <div class="card-title">Total Users</div>
+                <div class="card-value">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+            <div class="card" id="activeSubsCard">
+                <div class="card-title">Active Subscriptions</div>
+                <div class="card-value">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+            <div class="card" id="pendingPaymentsCard">
+                <div class="card-title">Pending Payments</div>
+                <div class="card-value">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+            <div class="card" id="totalContentCard">
+                <div class="card-title">Total Content</div>
+                <div class="card-value">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Payments Table -->
+        <div class="table-section" id="paymentsSection">
+            <div class="section-header">
+                <div class="section-title">Recent Payments</div>
+                <button class="btn btn-primary" onclick="exportPaymentsReport()">Export Report</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recentPaymentsTable">
+                    <tr>
+                        <td colspan="6" class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i> Loading payments...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- User Management Table -->
+        <div class="table-section" id="usersSection">
+            <div class="section-header">
+                <div class="section-title">User Management</div>
+                <div class="user-count">Total Users: <span id="userCount">0</span></div>
+            </div>
+            <!-- Update the User Management Table header -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Signup Date</th>
+                        <th>Last Login</th>
+                        <th>Subscription</th>
+                        <th>Access Until</th>
+                        <th>Time Remaining</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userManagementTable">
+                    <tr>
+                        <td colspan="6" class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i> Loading users...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Content Management Section -->
+        <div class="table-section" id="contentSection">
+            <div class="section-header">
+                <div class="section-title">Content Management</div>
+                <button class="btn btn-primary" onclick="openUploadModal()">Upload New Content</button>
+            </div>
+            
+            <!-- Upload Modal -->
+            <div id="uploadModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Upload New Content</h2>
+                        <span class="close" onclick="closeUploadModal()">&times;</span>
+                    </div>
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="contentTitle">Title</label>
+                            <input type="text" id="contentTitle" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contentType">Content Type</label>
+                            <select id="contentType" class="form-control" required>
+                                <option value="">Select Type</option>
+                                <option value="video">Video</option>
+                                <option value="pdf">PDF Document</option>
+                                <option value="audio">Audio</option>
+                                <option value="article">Article</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contentFile">File</label>
+                            <input type="file" id="contentFile" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contentDescription">Description</label>
+                            <textarea id="contentDescription" class="form-control" rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload Content</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Content Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Upload Date</th>
+                        <th>Size</th>
+                        <th>Views</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="contentTable">
+                    <tr>
+                        <td colspan="6" class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i> Loading content...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Customer Care Section -->
+        <div class="table-section" id="customerCareSection">
+            <div class="section-header">
+                <div class="section-title">Customer Inquiries</div>
+                <div class="contact-stats">
+                    <span><i class="fas fa-phone"></i> Active Calls: <span id="activeCallsCount">0</span></span>
+                    <span><i class="fas fa-envelope"></i> Unread Emails: <span id="unreadEmailsCount">0</span></span>
+                    <span><i class="fab fa-whatsapp"></i> WhatsApp Messages: <span id="whatsappCount">0</span></span>
+                </div>
+            </div>
+
+            <!-- Inquiry Tabs -->
+            <div class="inquiry-tabs">
+                <button class="tab-btn active" onclick="switchTab('all')">All Inquiries</button>
+                <button class="tab-btn" onclick="switchTab('calls')">Phone Calls</button>
+                <button class="tab-btn" onclick="switchTab('emails')">Emails</button>
+                <button class="tab-btn" onclick="switchTab('whatsapp')">WhatsApp</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Customer</th>
+                        <th>Subject</th>
+                        <th>Received</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="inquiriesTable">
+                    <tr>
+                        <td colspan="6" class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i> Loading inquiries...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Marketing Materials Section -->
+        <div class="table-section" id="marketingSection">
+            <div class="section-header">
+                <h2>Marketing Materials</h2>
+                <button class="btn btn-primary" onclick="openUploadModal()">Upload New Material</button>
+            </div>
+
+            <!-- Upload Modal -->
+            <div id="marketingUploadModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Upload Marketing Material</h2>
+                        <span class="close" onclick="closeUploadModal()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="marketingUploadForm" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="materialType">Material Type</label>
+                                <select id="materialType" class="form-control" required>
+                                    <option value="">Select Type</option>
+                                    <option value="banner">Banner Ad</option>
+                                    <option value="email">Email Template</option>
+                                    <option value="social">Social Media Content</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="materialTitle">Title</label>
+                                <input type="text" id="materialTitle" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="materialFile">File</label>
+                                <input type="file" id="materialFile" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="materialDescription">Description</label>
+                                <textarea id="materialDescription" class="form-control" rows="4"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Upload Material</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketing Materials Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Upload Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="marketingTable">
+                    <tr>
+                        <td colspan="4" class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i> Loading materials...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- M-Pesa Transaction Messages Section -->
+        <div class="table-section" id="transactionSection">
+            <div class="section-header">
+                <h2>M-Pesa Transaction Messages</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="refreshTransactions()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Transaction Code</th>
+                        <th>Phone Number</th>
+                        <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionTable">
+                    <!-- Transactions will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Recent Payments Table Section -->
+        <div class="table-section" id="recentPaymentsSection">
+            <div class="section-header">
+                <h2>Recent Payments</h2>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Transaction Code</th>
+                        <th>Phone Number</th>
+                        <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="recentPaymentsTable">
+                    <!-- Recent payments will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Basic interactivity for the dashboard
+        document.querySelectorAll('.sidebar-menu li').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar-menu li').forEach(i => {
+                    i.style.background = 'none';
+                });
+                this.style.background = 'rgba(255, 255, 255, 0.1)';
+            });
+        });
+
+        // Fetch dashboard data from backend
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('https://api.insecure2secure.com/api/dashboard/stats');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                updateDashboardCards(data);
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                showErrorState();
+            }
+        }
+
+        // Update dashboard cards with real data
+        function updateDashboardCards(data) {
+            document.querySelector('#totalUsersCard .card-value').textContent = 
+                data.totalUsers.toLocaleString();
+            
+            document.querySelector('#activeSubsCard .card-value').textContent = 
+                data.activeSubscriptions.toLocaleString();
+            
+            document.querySelector('#pendingPaymentsCard .card-value').textContent = 
+                data.pendingPayments.toLocaleString();
+            
+            document.querySelector('#totalContentCard .card-value').textContent = 
+                data.totalContent.toLocaleString();
+        }
+
+        // Fetch recent payments data
+        async function fetchRecentPayments() {
+            try {
+                const response = await fetch('https://api.insecure2secure.com/api/payments/recent');
+                if (!response.ok) throw new Error('Failed to fetch payments');
+                const payments = await response.json();
+                displayRecentPayments(payments);
+            } catch (error) {
+                console.error('Error fetching payments:', error);
+                showPaymentsError();
+            }
+        }
+
+        // Display recent payments in the table
+        function displayRecentPayments(payments) {
+            const tbody = document.getElementById('recentPaymentsTable');
+            tbody.innerHTML = payments.map(payment => `
+                <tr>
+                    <td>${escapeHtml(payment.userName)}</td>
+                    <td>${escapeHtml(payment.planName)}</td>
+                    <td>$${parseFloat(payment.amount).toFixed(2)}</td>
+                    <td>${new Date(payment.date).toLocaleString('en-US')}</td>
+                    <td><span class="status status-${payment.status.toLowerCase()}">${escapeHtml(payment.status)}</span></td>
+                    <td>
+                        <button class="action-btn btn-edit" onclick="viewPaymentDetails('${payment.id}')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Show error state if payments fetch fails
+        function showPaymentsError() {
+            const tbody = document.getElementById('recentPaymentsTable');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="color: var(--danger); text-align: center;">
+                        Failed to load payment data. Please try again later.
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Fetch users data
+        async function fetchUsers() {
+            try {
+                const response = await fetch('https://api.insecure2secure.com/api/users');
+                if (!response.ok) throw new Error('Failed to fetch users');
+                const users = await response.json();
+                displayUsers(users);
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                showUsersError();
+            }
+        }
+
+        // Display users in the table
+        function displayUsers(users) {
+            const tbody = document.getElementById('userManagementTable');
+            document.getElementById('userCount').textContent = users.length;
+            
+            tbody.innerHTML = users.map(user => {
+                const timeRemaining = calculateTimeRemaining(user.accessEndTime);
+                const status = determineUserStatus(user.accessEndTime);
+                
+                return `
+                    <tr>
+                        <td>${escapeHtml(user.fullName)}</td>
+                        <td>${escapeHtml(user.email)}</td>
+                        <td>${escapeHtml(user.phone)}</td>
+                        <td>${new Date(user.signupDate).toLocaleString()}</td>
+                        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}</td>
+                        <td>${escapeHtml(user.subscriptionPlan)}</td>
+                        <td>${user.accessEndTime ? new Date(user.accessEndTime).toLocaleString() : 'No active subscription'}</td>
+                        <td>${timeRemaining}</td>
+                        <td><span class="status status-${status.toLowerCase()}">${status}</span></td>
+                        <td>
+                            <button class="action-btn btn-view" onclick="viewUserDetails('${user.id}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="action-btn btn-edit" onclick="manageAccess('${user.id}')">
+                                <i class="fas fa-clock"></i> Manage Access
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function calculateTimeRemaining(endTime) {
+            if (!endTime) return 'No subscription';
+            
+            const now = new Date();
+            const end = new Date(endTime);
+            const diff = end - now;
+            
+            if (diff <= 0) return 'Expired';
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (days > 0) return `${days}d ${hours}h`;
+            if (hours > 0) return `${hours}h ${minutes}m`;
+            return `${minutes}m`;
+        }
+
+        function determineUserStatus(endTime) {
+            if (!endTime) return 'Inactive';
+            return new Date(endTime) > new Date() ? 'Active' : 'Expired';
+        }
+
+        function manageAccess(userId) {
+            const users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            const modalHTML = `
+                <div id="accessModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Manage User Access</h2>
+                            <span class="close" onclick="closeAccessModal()">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div class="user-info">
+                                <p><strong>User:</strong> ${escapeHtml(user.fullName)}</p>
+                                <p><strong>Current Plan:</strong> ${escapeHtml(user.subscriptionPlan || 'None')}</p>
+                            </div>
+                            <form id="accessForm" onsubmit="setUserAccess(event, '${userId}')">
+                                <div class="form-group">
+                                    <label>Select Access Duration:</label>
+                                    <select id="accessDuration" class="form-control" required>
+                                        <option value="60">60 Minutes Access</option>
+                                        <option value="1440">24 Hours Access</option>
+                                        <option value="2880">2 Days Access</option>
+                                        <option value="43200">30 Days Access</option>
+                                        <option value="525600">12 Months Access</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Set Access Time</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            document.getElementById('accessModal').style.display = 'block';
+        }
+
+        function setUserAccess(event, userId) {
+            event.preventDefault();
+            
+            const minutes = parseInt(document.getElementById('accessDuration').value);
+            const users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            const userIndex = users.findIndex(u => u.id === userId);
+            
+            if (userIndex === -1) return;
+            
+            const now = new Date();
+            users[userIndex].accessEndTime = new Date(now.getTime() + minutes * 60000).toISOString();
+            users[userIndex].subscriptionPlan = getSubscriptionPlanFromMinutes(minutes);
+            
+            localStorage.setItem('i2s_users', JSON.stringify(users));
+            closeAccessModal();
+            displayUsers(users);
+        }
+
+        function getSubscriptionPlanFromMinutes(minutes) {
+            switch(minutes) {
+                case 60: return 'Hourly';
+                case 1440: return 'Daily';
+                case 2880: return '2-Day';
+                case 43200: return 'Monthly';
+                case 525600: return 'Annual';
+                default: return 'Custom';
+            }
+        }
+
+        function closeAccessModal() {
+            const modal = document.getElementById('accessModal');
+            modal.remove();
+        }
+
+        // Add user access check function
+        function checkUserAccess(userId) {
+            const users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            const user = users.find(u => u.id === userId);
+            
+            if (!user || !user.accessEndTime) return false;
+            return new Date(user.accessEndTime) > new Date();
+        }
+
+        // Update the upload form submission handler
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('contentTitle').value);
+            formData.append('type', document.getElementById('contentType').value);
+            formData.append('file', document.getElementById('contentFile').files[0]);
+            formData.append('description', document.getElementById('contentDescription').value);
+
+            try {
+                const response = await fetch('https://api.insecure2secure.com/api/content/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Upload failed');
+                
+                // Notify success
+                alert('Content uploaded successfully!');
+                
+                // Close modal and refresh content
+                closeUploadModal();
+                fetchContent();
+                
+                // Update public resources cache
+                localStorage.setItem('resourcesLastUpdate', Date.now());
+            } catch (error) {
+                console.error('Error uploading content:', error);
+                alert('Failed to upload content. Please try again later.');
+            }
+        });
+
+        // Escape HTML helper function
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Scroll to payments section
+        function scrollToPayments(event) {
+            event.preventDefault();
+            const paymentsSection = document.getElementById('paymentsSection');
+            paymentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Highlight the section briefly
+            paymentsSection.style.animation = 'highlightSection 2s';
+        }
+
+        // Scroll to users section
+        function scrollToUsers(event) {
+            event.preventDefault();
+            const usersSection = document.getElementById('usersSection');
+            usersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Highlight the section briefly
+            usersSection.style.animation = 'none';
+            usersSection.offsetHeight; // Trigger reflow
+            usersSection.style.animation = 'highlightSection 2s';
+        }
+
+        // Scroll to content section
+        function scrollToContent(event) {
+            event.preventDefault();
+            const contentSection = document.getElementById('contentSection');
+            contentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Highlight the section briefly
+            contentSection.style.animation = 'none';
+            contentSection.offsetHeight; // Trigger reflow
+            contentSection.style.animation = 'highlightSection 2s';
+        }
+
+        // Customer Care Functions
+        function scrollToCustomerCare(event) {
+            event.preventDefault();
+            const customerCareSection = document.getElementById('customerCareSection');
+            customerCareSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            customerCareSection.style.animation = 'highlightSection 2s';
+        }
+
+        async function fetchInquiries(type = 'all') {
+            try {
+                const response = await fetch(`https://api.insecure2secure.com/api/inquiries?type=${type}`);
+                if (!response.ok) throw new Error('Failed to fetch inquiries');
+                const inquiries = await response.json();
+                displayInquiries(inquiries);
+                updateInquiryCounts(inquiries);
+            } catch (error) {
+                console.error('Error fetching inquiries:', error);
+                showInquiriesError();
+            }
+        }
+
+        function displayInquiries(inquiries) {
+            const tbody = document.getElementById('inquiriesTable');
+            tbody.innerHTML = inquiries.map(inquiry => `
+                <tr>
+                    <td>
+                        <i class="fas ${getInquiryIcon(inquiry.type)}" title="${inquiry.type}"></i>
+                        ${escapeHtml(inquiry.type)}
+                    </td>
+                    <td>${escapeHtml(inquiry.customerName)}</td>
+                    <td>${escapeHtml(inquiry.subject)}</td>
+                    <td>${new Date(inquiry.receivedDate).toLocaleString('en-GB')}</td>
+                    <td><span class="status status-${inquiry.status.toLowerCase()}">${escapeHtml(inquiry.status)}</span></td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewInquiry('${inquiry.id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn btn-edit" onclick="respondToInquiry('${inquiry.id}')">
+                            <i class="fas fa-reply"></i> Respond
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getInquiryIcon(type) {
+            switch(type.toLowerCase()) {
+                case 'call': return 'fa-phone';
+                case 'email': return 'fa-envelope';
+                case 'whatsapp': return 'fa-whatsapp';
+                default: return 'fa-message';
+            }
+        }
+
+        function updateInquiryCounts(inquiries) {
+            document.getElementById('activeCallsCount').textContent = 
+                inquiries.filter(i => i.type === 'call' && i.status === 'new').length;
+            document.getElementById('unreadEmailsCount').textContent = 
+                inquiries.filter(i => i.type === 'email' && i.status === 'new').length;
+            document.getElementById('whatsappCount').textContent = 
+                inquiries.filter(i => i.type === 'whatsapp' && i.status === 'new').length;
+        }
+
+        function switchTab(type) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            fetchInquiries(type);
+        }
+
+        async function viewInquiry(inquiryId) {
+            try {
+                const response = await fetch(`https://api.insecure2secure.com/api/inquiries/${inquiryId}`);
+                if (!response.ok) throw new Error('Failed to fetch inquiry details');
+                const inquiry = await response.json();
+                showInquiryModal(inquiry);
+            } catch (error) {
+                console.error('Error fetching inquiry details:', error);
+                alert('Failed to load inquiry details. Please try again later.');
+            }
+        }
+
+        function openUploadModal() {
+            document.getElementById('marketingUploadModal').style.display = 'flex';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('marketingUploadModal').style.display = 'none';
+        }
+
+        // Initialize marketing materials handling
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMarketingMaterials();
+            
+            document.getElementById('marketingUploadForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                formData.append('type', document.getElementById('materialType').value);
+                formData.append('title', document.getElementById('materialTitle').value);
+                formData.append('file', document.getElementById('materialFile').files[0]);
+                formData.append('description', document.getElementById('materialDescription').value);
+                
+                try {
+                    // Store in localStorage for demo
+                    const materials = JSON.parse(localStorage.getItem('marketingMaterials') || '[]');
+                    const newMaterial = {
+                        id: 'mat_' + Date.now(),
+                        type: document.getElementById('materialType').value,
+                        title: document.getElementById('materialTitle').value,
+                        fileName: document.getElementById('materialFile').files[0].name,
+                        description: document.getElementById('materialDescription').value,
+                        uploadDate: new Date().toISOString(),
+                        downloads: 0,
+                        status: 'Active'
+                    };
+                    
+                    materials.push(newMaterial);
+                    localStorage.setItem('marketingMaterials', JSON.stringify(materials));
+                    
+                    alert('Material uploaded successfully!');
+                    closeUploadModal();
+                    loadMarketingMaterials();
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert('Upload failed. Please try again.');
+                }
+            });
+        });
+
+        function loadMarketingMaterials() {
+            const materials = JSON.parse(localStorage.getItem('marketingMaterials') || '[]');
+            const tableBody = document.getElementById('marketingMaterialsTable');
+            
+            if (materials.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No marketing materials uploaded yet</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tableBody.innerHTML = materials.map(material => `
+                <tr>
+                    <td>${material.type.charAt(0).toUpperCase() + material.type.slice(1)}</td>
+                    <td>${material.title}</td>
+                    <td>${new Date(material.uploadDate).toLocaleDateString()}</td>
+                    <td>${material.downloads}</td>
+                    <td><span class="status-${material.status.toLowerCase()}">${material.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-view" onclick="viewMaterial('${material.id}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-delete" onclick="deleteMaterial('${material.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewMaterial(materialId) {
+            const materials = JSON.parse(localStorage.getItem('marketingMaterials') || '[]');
+            const material = materials.find(m => m.id === materialId);
+            if (!material) return;
+            
+            alert(`
+                Title: ${material.title}
+                Type: ${material.type}
+                Description: ${material.description}
+                File: ${material.fileName}
+                Downloads: ${material.downloads}
+                Upload Date: ${new Date(material.uploadDate).toLocaleDateString()}
+            `);
+        }
+
+        function deleteMaterial(materialId) {
+            if (!confirm('Are you sure you want to delete this material?')) return;
+            
+            const materials = JSON.parse(localStorage.getItem('marketingMaterials') || '[]');
+            const updatedMaterials = materials.filter(m => m.id !== materialId);
+            localStorage.setItem('marketingMaterials', JSON.stringify(updatedMaterials));
+            loadMarketingMaterials();
+        }
+
+        function loadTransactions() {
+            const transactions = JSON.parse(localStorage.getItem('pendingPayments') || '[]');
+            const tableBody = document.getElementById('transactionTable');
+            
+            tableBody.innerHTML = transactions.length === 0 ? `
+                <tr><td colspan="7" class="text-center">No pending transactions</td></tr>
+            ` : transactions.map(tx => `
+                <tr>
+                    <td>${new Date(tx.timestamp).toLocaleString()}</td>
+                    <td>${tx.mpesaCode}</td>
+                    <td>${tx.phoneNumber}</td>
+                    <td>${tx.plan}</td>
+                    <td>${tx.amount}</td>
+                    <td><span class="status-${tx.status.toLowerCase()}">${tx.status}</span></td>
+                    <td>
+                        ${tx.status === 'pending' ? `
+                            <button class="action-btn btn-approve" onclick="handleTransaction('${tx.mpesaCode}', 'approve')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="action-btn btn-reject" onclick="handleTransaction('${tx.mpesaCode}', 'reject')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `).join('');
+
+            loadRecentPayments();
+        }
+
+        function handleTransaction(mpesaCode, action) {
+            if (!confirm(`Are you sure you want to ${action} this transaction?`)) return;
+            
+            let transactions = JSON.parse(localStorage.getItem('pendingPayments') || '[]');
+            const transactionIndex = transactions.findIndex(tx => tx.mpesaCode === mpesaCode);
+            
+            if (transactionIndex === -1) return;
+            
+            if (action === 'approve') {
+                // Update transaction status
+                transactions[transactionIndex].status = 'approved';
+                
+                // Add to recent payments
+                let recentPayments = JSON.parse(localStorage.getItem('recentPayments') || '[]');
+                recentPayments.unshift(transactions[transactionIndex]);
+                localStorage.setItem('recentPayments', JSON.stringify(recentPayments));
+                
+                // Grant user access
+                grantUserAccess(transactions[transactionIndex]);
+            } else {
+                // Mark as rejected
+                transactions[transactionIndex].status = 'rejected';
+            }
+            
+            localStorage.setItem('pendingPayments', JSON.stringify(transactions));
+            loadTransactions();
+        }
+
+        function loadRecentPayments() {
+            const payments = JSON.parse(localStorage.getItem('recentPayments') || '[]');
+            const tableBody = document.getElementById('recentPaymentsTable');
+            
+            tableBody.innerHTML = payments.length === 0 ? `
+                <tr><td colspan="6" class="text-center">No recent payments</td></tr>
+            ` : payments.map(payment => `
+                <tr>
+                    <td>${new Date(payment.timestamp).toLocaleString()}</td>
+                    <td>${payment.mpesaCode}</td>
+                    <td>${payment.phoneNumber}</td>
+                    <td>${payment.plan}</td>
+                    <td>${payment.amount}</td>
+                    <td><span class="status-approved">Approved</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function grantUserAccess(transaction) {
+            let users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            const userIndex = users.findIndex(u => u.phone === transaction.phoneNumber);
+            
+            if (userIndex !== -1) {
+                users[userIndex].subscriptionPlan = transaction.plan;
+                users[userIndex].subscriptionEndDate = calculateEndDate(transaction.plan);
+                localStorage.setItem('i2s_users', JSON.stringify(users));
+            }
+        }
+
+        // Add to your DOMContentLoaded event
+        document.addEventListener('DOMContentLoaded', function() {
+            // ...existing code...
+            loadTransactions();
+        });
+    </script>
+</body>
+</html>
+

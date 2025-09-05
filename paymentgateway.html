@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Payment Instructions - Insecure2Secure</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a5acd;
+            --secondary: #ff7e5f;
+            --success: #28a745;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--light);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .payment-steps {
+            margin: 30px 0;
+        }
+
+        .step {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background: #e8eaf6;
+            padding: 10px;
+            border-radius: 4px;
+            color: var(--primary);
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .confirmation-form {
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .success-message i {
+            color: var(--success);
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .plan-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .plan-card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1 1 calc(33.333% - 40px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--primary);
+        }
+
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .plan-features li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .plan-features li:before {
+            content: '✔';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+        }
+
+        .btn-select {
+            background: var(--secondary);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .btn-select:hover {
+            background: #e67e22;
+        }
+
+        .recommended {
+            border: 2px solid var(--success);
+            padding: 18px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .recommended .badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--success);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .selected-plan-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-left: 5px solid var(--success);
+            border-radius: 4px;
+        }
+
+        .btn-change {
+            background: transparent;
+            color: var(--primary);
+            padding: 10px 20px;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .btn-change:hover {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Payment Instructions</h1>
+            <p>Follow these steps to complete your subscription</p>
+        </div>
+
+        <div class="payment-steps">
+            <div class="step">
+                <div class="step-number">Step 1: Plan Selection</div>
+                <div class="plan-options">
+                    <div class="plan-card recommended">
+                        <div class="badge">Most Popular</div>
+                        <h3>Hourly Plan</h3>
+                        <div class="price">KES 20</div>
+                        <ul class="plan-features">
+                            <li>24/7 support</li>
+                            <li>Full resources access</li>
+                            <li>1-hour Accessibility</li>
+                        </ul>
+                        <button class="btn-select" onclick="selectPlan('Hourly', 20)">Select Plan</button>
+                    </div>
+
+                    <div class="plan-card">
+                        <h3>Daily Plan</h3>
+                        <div class="price">KES 100</div>
+                        <ul class="plan-features">
+                            <li>24/7 support</li>
+                            <li>Full resources access</li>
+                            <li>24-hour Accessibility</li>
+                        </ul>
+                        <button class="btn-select" onclick="selectPlan('Daily', 100)">Select Plan</button>
+                    </div>
+
+                    <div class="plan-card">
+                        <h3>Weekly Plan</h3>
+                        <div class="price">KES 500</div>
+                        <ul class="plan-features">
+                            <li>24/7 priority support</li>
+                            <li>Full resources access</li>
+                            <li>Weekly Access</li>
+                        </ul>
+                        <button class="btn-select" onclick="selectPlan('Weekly', 500)">Select Plan</button>
+                    </div>
+
+                    <div class="plan-card">
+                        <h3>Monthly Plan</h3>
+                        <div class="price">KES 1800</div>
+                        <ul class="plan-features">
+                            <li>24/7 priority support</li>
+                            <li>Full resources access</li>
+                            <li>Monthly  Service Access</li>
+                        </ul>
+                        <button class="btn-select" onclick="selectPlan('Monthly', 1800)">Select Plan</button>
+                    </div>
+
+                    <div class="plan-card">
+                        <h3>Annual Plan</h3>
+                        <div class="price">KES 24,000</div>
+                        <ul class="plan-features">
+                            <li>24/7 VIP support</li>
+                            <li>Full resources access</li>
+                            <li>Annual Service Access</li>
+                        </ul>
+                        <button class="btn-select" onclick="selectPlan('Annual', 24,000)">Select Plan</button>
+                    </div>
+                </div>
+                <div class="selected-plan-info" style="display: none;">
+                    <p>You have selected: <span id="selectedPlan" class="highlight">Loading...</span></p>
+                    <p>Amount to pay: <span id="planAmount" class="highlight">Loading...</span></p>
+                    <button class="btn-change" onclick="showPlans()">Change Plan</button>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Step 2: Make Payment</div>
+                <ol>
+                    <li>Go to M-PESA on your phone</li>
+                    <li>Select Lipa na M-Pesa</li>
+                    <li>Select Buy Goods and Services</li>
+                    <li>Enter Till Number No: <span class="highlight">8656488</span>-NGURE LEWIS GACHERU</li>
+                    <li>Enter Amount shown above</li>
+                    <li>Enter your M-PESA PIN and submit</li>
+                    <li>You will receive an M-PESA confirmation message</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Step 3: Submit Payment Details</div>
+                <form id="paymentForm" class="confirmation-form">
+                    <div class="form-group">
+                        <label for="mpesaCode">M-PESA Transaction Code</label>
+                        <input type="text" 
+                               id="mpesaCode" 
+                               placeholder="e.g., RGB123456" 
+                               pattern="[A-Z]{3}[0-9]{6}"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number Used</label>
+                        <input type="tel" 
+                               id="phoneNumber" 
+                               placeholder="e.g., 0712345678"
+                               pattern="^(?:254|\+254|0)?(7(?:(?:[129][0-9])|(?:0[0-8])|(4[0-1]))[0-9]{6})$"
+                               required>
+                    </div>
+                    <button type="submit" class="btn">Submit Payment Details</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="successMessage" class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <h2>Payment Submitted Successfully!</h2>
+            <p>Your payment is being verified. You will receive access once confirmed.</p>
+            <p>Redirecting to homepage in <span id="countdown">5</span> seconds...</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get plan details from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const plan = urlParams.get('plan');
+            const amount = urlParams.get('amount');
+
+            // Display plan details
+            document.getElementById('selectedPlan').textContent = plan;
+            document.getElementById('planAmount').textContent = `KES ${amount}`;
+            document.getElementById('accountRef').textContent = generateReference();
+
+            // Handle form submission
+            document.getElementById('paymentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handlePaymentSubmission();
+            });
+        });
+
+        function generateReference() {
+            return 'I2S' + Date.now().toString().slice(-6);
+        }
+
+        function handlePaymentSubmission() {
+            const mpesaCode = document.getElementById('mpesaCode').value.toUpperCase();
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const plan = document.getElementById('selectedPlan').textContent;
+            const amount = document.getElementById('planAmount').textContent;
+
+            // Store payment details
+            const paymentDetails = {
+                mpesaCode,
+                phoneNumber,
+                plan,
+                amount,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            // Save to localStorage
+            let pendingPayments = JSON.parse(localStorage.getItem('pendingPayments') || '[]');
+            
+            // Check if transaction code already exists
+            if (pendingPayments.some(p => p.mpesaCode === mpesaCode)) {
+                alert('This transaction code has already been used.');
+                return;
+            }
+            
+            pendingPayments.push(paymentDetails);
+            localStorage.setItem('pendingPayments', JSON.stringify(pendingPayments));
+
+            // Show success message
+            showSuccessMessage();
+        }
+
+        function showSuccessMessage() {
+            document.querySelector('.payment-steps').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+            
+            let countdown = 5;
+            const countdownElement = document.getElementById('countdown');
+            
+            const timer = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
+        }
+
+        function selectPlan(planName, planPrice) {
+            document.getElementById('selectedPlan').textContent = planName;
+            document.getElementById('planAmount').textContent = `KES ${planPrice}`;
+            document.querySelector('.selected-plan-info').style.display = 'block';
+            document.querySelector('.plan-options').style.display = 'none';
+        }
+
+        function showPlans() {
+            document.querySelector('.plan-options').style.display = 'flex';
+            document.querySelector('.selected-plan-info').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
