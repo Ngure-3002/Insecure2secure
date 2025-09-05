@@ -951,11 +951,12 @@
         }
 
         // Display users in the table
-        function displayUsers(users) {
-            const tbody = document.getElementById('userManagementTable');
+        function displayUsers() {
+            const users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            const tableBody = document.getElementById('userManagementTable');
             document.getElementById('userCount').textContent = users.length;
-            
-            tbody.innerHTML = users.map(user => {
+
+            tableBody.innerHTML = users.map(user => {
                 const timeRemaining = calculateTimeRemaining(user.accessEndTime);
                 const status = determineUserStatus(user.accessEndTime);
                 
@@ -965,11 +966,11 @@
                         <td>${escapeHtml(user.email)}</td>
                         <td>${escapeHtml(user.phone)}</td>
                         <td>${new Date(user.signupDate).toLocaleString()}</td>
-                        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}</td>
+                        <td>${new Date(user.lastLogin).toLocaleString()}</td>
                         <td>${escapeHtml(user.subscriptionPlan)}</td>
-                        <td>${user.accessEndTime ? new Date(user.accessEndTime).toLocaleString() : 'No active subscription'}</td>
+                        <td>${user.accessEndTime ? new Date(user.accessEndTime).toLocaleString() : 'No subscription'}</td>
                         <td>${timeRemaining}</td>
-                        <td><span class="status status-${status.toLowerCase()}">${status}</span></td>
+                        <td><span class="status-${status.toLowerCase()}">${status}</span></td>
                         <td>
                             <button class="action-btn btn-view" onclick="viewUserDetails('${user.id}')">
                                 <i class="fas fa-eye"></i> View
@@ -983,6 +984,10 @@
             }).join('');
         }
 
+        // Refresh user table every minute
+        setInterval(displayUsers, 60000);
+
+        // Calculate remaining time
         function calculateTimeRemaining(endTime) {
             if (!endTime) return 'No subscription';
             
@@ -1001,6 +1006,7 @@
             return `${minutes}m`;
         }
 
+        // Determine user status
         function determineUserStatus(endTime) {
             if (!endTime) return 'Inactive';
             return new Date(endTime) > new Date() ? 'Active' : 'Expired';
@@ -1356,9 +1362,16 @@
             const transactions = JSON.parse(localStorage.getItem('pendingPayments') || '[]');
             const tableBody = document.getElementById('transactionTable');
             
-            tableBody.innerHTML = transactions.length === 0 ? `
-                <tr><td colspan="7" class="text-center">No pending transactions</td></tr>
-            ` : transactions.map(tx => `
+            if (transactions.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center">No pending transactions</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = transactions.map(tx => `
                 <tr>
                     <td>${new Date(tx.timestamp).toLocaleString()}</td>
                     <td>${tx.mpesaCode}</td>
@@ -1379,6 +1392,7 @@
                 </tr>
             `).join('');
 
+            // Also update recent payments if any
             loadRecentPayments();
         }
 
@@ -1399,7 +1413,7 @@
                 recentPayments.unshift(transactions[transactionIndex]);
                 localStorage.setItem('recentPayments', JSON.stringify(recentPayments));
                 
-                // Grant user access
+                // Update user access
                 grantUserAccess(transactions[transactionIndex]);
             } else {
                 // Mark as rejected
@@ -1410,39 +1424,15 @@
             loadTransactions();
         }
 
-        function loadRecentPayments() {
-            const payments = JSON.parse(localStorage.getItem('recentPayments') || '[]');
-            const tableBody = document.getElementById('recentPaymentsTable');
-            
-            tableBody.innerHTML = payments.length === 0 ? `
-                <tr><td colspan="6" class="text-center">No recent payments</td></tr>
-            ` : payments.map(payment => `
-                <tr>
-                    <td>${new Date(payment.timestamp).toLocaleString()}</td>
-                    <td>${payment.mpesaCode}</td>
-                    <td>${payment.phoneNumber}</td>
-                    <td>${payment.plan}</td>
-                    <td>${payment.amount}</td>
-                    <td><span class="status-approved">Approved</span></td>
-                </tr>
-            `).join('');
-        }
-
-        function grantUserAccess(transaction) {
-            let users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
-            const userIndex = users.findIndex(u => u.phone === transaction.phoneNumber);
-            
-            if (userIndex !== -1) {
-                users[userIndex].subscriptionPlan = transaction.plan;
-                users[userIndex].subscriptionEndDate = calculateEndDate(transaction.plan);
-                localStorage.setItem('i2s_users', JSON.stringify(users));
-            }
-        }
-
-        // Add to your DOMContentLoaded event
-        document.addEventListener('DOMContentLoaded', function() {
-            // ...existing code...
+        function refreshTransactions() {
             loadTransactions();
+        }
+
+        // Make sure this is called when the dashboard loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTransactions();
+            // Set up auto-refresh every 30 seconds
+            setInterval(loadTransactions, 30000);
         });
     </script>
 </body>
