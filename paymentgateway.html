@@ -284,7 +284,7 @@
 
                     <div class="plan-card">
                         <h3>Annual Plan</h3>
-                        <div class="price">KES 24,000</div>
+                        <div class="price">KES 24000</div>
                         <ul class="plan-features">
                             <li>24/7 VIP support</li>
                             <li>Full resources access</li>
@@ -315,13 +315,16 @@
 
             <div class="step">
                 <div class="step-number">Step 3: Submit Payment Details</div>
-                <form id="paymentForm" class="confirmation-form">
+                <form id="confirmationForm" onsubmit="handlePaymentSubmission(event)">
                     <div class="form-group">
                         <label for="mpesaCode">M-PESA Transaction Code</label>
                         <input type="text" 
                                id="mpesaCode" 
                                placeholder="e.g., RGB123456" 
-                               pattern="[A-Z]{3}[0-9]{6}"
+                               pattern="[A-Z0-9]{10}"
+                               minlength="10"
+                               maxlength="10"
+                               oninput="this.value = this.value.toUpperCase()"
                                required>
                     </div>
                     <div class="form-group">
@@ -329,7 +332,7 @@
                         <input type="tel" 
                                id="phoneNumber" 
                                placeholder="e.g., 0712345678"
-                               pattern="^(?:254|\+254|0)?(7(?:(?:[129][0-9])|(?:0[0-8])|(4[0-1]))[0-9]{6})$"
+                               pattern="^(?:254|\+254|0)?(7(?:(?:[129][0-9])|(?:0[0-8])|(?:4[0-3])|(?:4[5-9])|(?:5[7-9])|(?:6[8-9])[0-9]{6})$"
                                required>
                     </div>
                     <button type="submit" class="btn">Submit Payment Details</button>
@@ -368,32 +371,42 @@
             return 'I2S' + Date.now().toString().slice(-6);
         }
 
-        function handlePaymentSubmission() {
+        function handlePaymentSubmission(event) {
+            event.preventDefault();
+
+            // Get form values
             const mpesaCode = document.getElementById('mpesaCode').value.toUpperCase();
             const phoneNumber = document.getElementById('phoneNumber').value;
-            const plan = document.getElementById('selectedPlan').textContent;
-            const amount = document.getElementById('planAmount').textContent;
+            const selectedPlan = document.getElementById('selectedPlan').textContent;
+            const planAmount = document.getElementById('planAmount').textContent;
 
-            // Store payment details
-            const paymentDetails = {
-                mpesaCode,
-                phoneNumber,
-                plan,
-                amount,
+            // Validate transaction code format
+            if (!/^[A-Z0-9]{10}$/.test(mpesaCode)) {
+                alert('Please enter a valid 10-character transaction code.');
+                return;
+            }
+
+            // Create transaction record
+            const transactionDetails = {
+                mpesaCode: mpesaCode,
+                phoneNumber: phoneNumber,
+                plan: selectedPlan,
+                amount: planAmount,
                 timestamp: new Date().toISOString(),
                 status: 'pending'
             };
 
-            // Save to localStorage
+            // Store in localStorage for pending transactions
             let pendingPayments = JSON.parse(localStorage.getItem('pendingPayments') || '[]');
             
-            // Check if transaction code already exists
-            if (pendingPayments.some(p => p.mpesaCode === mpesaCode)) {
-                alert('This transaction code has already been used.');
+            // Check for duplicate transaction code
+            if (pendingPayments.some(payment => payment.mpesaCode === mpesaCode)) {
+                alert('This transaction code has already been submitted.');
                 return;
             }
-            
-            pendingPayments.push(paymentDetails);
+
+            // Add new transaction
+            pendingPayments.unshift(transactionDetails);
             localStorage.setItem('pendingPayments', JSON.stringify(pendingPayments));
 
             // Show success message
@@ -401,16 +414,22 @@
         }
 
         function showSuccessMessage() {
-            document.querySelector('.payment-steps').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-            
+            const confirmationForm = document.getElementById('confirmationForm');
+            confirmationForm.innerHTML = `
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Payment Details Submitted Successfully!</h3>
+                    <p>Your payment is pending approval.</p>
+                    <p>You will receive access once confirmed.</p>
+                    <p class="countdown">Redirecting to homepage in <span id="countdown">5</span> seconds...</p>
+                </div>
+            `;
+
             let countdown = 5;
             const countdownElement = document.getElementById('countdown');
-            
             const timer = setInterval(() => {
                 countdown--;
                 countdownElement.textContent = countdown;
-                
                 if (countdown <= 0) {
                     clearInterval(timer);
                     window.location.href = 'index.html';
@@ -431,5 +450,4 @@
         }
     </script>
 </body>
-
 </html>
