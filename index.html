@@ -1042,6 +1042,33 @@
         </div>
     </div>
 
+    <!-- Password Reset Modal -->
+    <div class="modal" id="resetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reset Your Password</h2>
+                <span class="close" onclick="closeResetModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="resetForm" onsubmit="handlePasswordReset(event)">
+                    <div class="form-group">
+                        <label for="resetEmail">Email</label>
+                        <input type="email" class="form-control" id="resetEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmNewPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Reset Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- FAQ Modal -->
     <div class="modal" id="faqModal">
         <div class="modal-content">
@@ -1358,6 +1385,14 @@
             document.getElementById('signupModal').style.display = 'none';
         }
 
+        function openResetModal() {
+            document.getElementById('resetModal').style.display = 'flex';
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').style.display = 'none';
+        }
+
         function openFaqModal(event) {
             event.preventDefault();
             document.getElementById('faqModal').style.display = 'flex';
@@ -1430,162 +1465,117 @@
             localStorage.setItem('i2s_users', JSON.stringify(users));
         }
 
-        // Update handleSignup function
-        function handleSignup(event) {
-            event.preventDefault();
-            const userData = {
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('signupEmail').value,
-                password: document.getElementById('signupPassword').value, // Note: In production, never store plain passwords
-                phone: document.getElementById('phone').value,
-                subscriptionPlan: 'None',
-                lastLogin: null
-            };
+        // Replace the existing handleSignup function
 
-            // Store user data
-            storeUserData(userData);
-
-            // Continue with existing signup logic
-            fetch('https://api.insecure2secure.com/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fullName: document.getElementById('fullName').value,
-                    email: document.getElementById('signupEmail').value,
-                    password: document.getElementById('signupPassword').value,
-                    phone: document.getElementById('phone').value
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Registration successful! Please check your email to verify your account.');
-                    closeSignupModal();
-                    openLoginModal();
-                } else {
-                    alert(data.message || 'Registration failed. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Signup error:', error);
-                alert('Registration failed. Please try again later.');
-            });
-        }
-
-        // Replace placeholder API calls with real endpoints
-async function handleLogin(event) {
+function handleSignup(event) {
     event.preventDefault();
-    try {
-        const response = await fetch('http://localhost:5000/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            })
-        });
-
-        const data = await response.json();
-        if (data.token) {
-            localStorage.setItem('token', data.token);
-            window.location.href = 'dashboard.html';
-        } else {
-            alert(data.message);
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        alert('Login failed. Please try again.');
-    }
-}
-
-        function switchToSignup() {
-            closeLoginModal();
-            openSignupModal();
-        }
-
-        function switchToLogin() {
-            closeSignupModal();
-            openLoginModal();
-        }
-
-        // Add to your existing script section
-async function loadResources() {
-    try {
-        const response = await fetch('https://api.insecure2secure.com/api/content/public');
-        if (!response.ok) throw new Error('Failed to fetch resources');
-        const resources = await response.json();
-        displayResources(resources);
-    } catch (error) {
-        console.error('Error loading resources:', error);
-        showResourcesError();
-    }
-}
-
-function displayResources(resources) {
-    const container = document.getElementById('resourcesContainer');
     
-    if (resources.length === 0) {
-        container.innerHTML = '<div class="no-content">No resources available yet.</div>';
+    const userData = {
+        id: 'user_' + Date.now(),
+        fullName: document.getElementById('fullName').value,
+        email: document.getElementById('signupEmail').value,
+        password: document.getElementById('signupPassword').value,
+        phone: document.getElementById('phone').value,
+        signupDate: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        subscriptionPlan: 'None',
+        accessEndTime: null,
+        status: 'Active'
+    };
+
+    // Check if email already exists
+    let users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+    if (users.some(user => user.email === userData.email)) {
+        alert('Email already registered. Please login instead.');
+        switchToLogin();
         return;
     }
 
-    container.innerHTML = resources.map(resource => `
-        <div class="resource-card">
-            <div class="resource-type">
-                <i class="fas ${getResourceIcon(resource.type)}"></i>
-                <div>${resource.type}</div>
-            </div>
-            <div class="resource-info">
-                <h3 class="resource-title">${escapeHtml(resource.title)}</h3>
-                <p class="resource-description">${escapeHtml(resource.description)}</p>
-                <div class="resource-meta">
-                    <span><i class="fas fa-calendar"></i> ${new Date(resource.uploadDate).toLocaleDateString()}</span>
-                    <span><i class="fas fa-eye"></i> ${resource.views} views</span>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    // Store user data
+    users.push(userData);
+    localStorage.setItem('i2s_users', JSON.stringify(users));
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+
+    // Close signup modal and redirect to payment gateway
+    closeSignupModal();
+    window.location.href = 'paymentgateway.html';
 }
 
-function getResourceIcon(type) {
-    switch(type.toLowerCase()) {
-        case 'video': return 'fa-video';
-        case 'pdf': return 'fa-file-pdf';
-        case 'audio': return 'fa-headphones';
-        case 'article': return 'fa-newspaper';
-        default: return 'fa-file';
+// Replace the existing handleLogin function
+function handleLogin(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    let users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+        // Update last login time
+        user.lastLogin = new Date().toISOString();
+        localStorage.setItem('i2s_users', JSON.stringify(users));
+        localStorage.setItem('currentUser', JSON.stringify(user));
+
+        // Close login modal and redirect to index.html
+        closeLoginModal();
+        window.location.href = 'index.html';
+    } else {
+        alert('Invalid credentials. Please try again.');
     }
 }
 
-function showResourcesError() {
-    const container = document.getElementById('resourcesContainer');
-    container.innerHTML = `
-        <div class="error-state">
-            <i class="fas fa-exclamation-circle"></i>
-            <p>Failed to load resources. Please try again later.</p>
-        </div>
-    `;
+// Replace the existing handlePasswordReset function
+function handlePasswordReset(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('resetEmail').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+    if (newPassword !== confirmNewPassword) {
+        alert('Passwords do not match!');
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+    const userIndex = users.findIndex(u => u.email === email);
+
+    if (userIndex === -1) {
+        alert('Email not found.');
+        return;
+    }
+
+    // Update password
+    users[userIndex].password = newPassword;
+    users[userIndex].lastLogin = new Date().toISOString();
+    localStorage.setItem('i2s_users', JSON.stringify(users));
+
+    alert('Password reset successful! Please login with your new password.');
+    closeResetModal();
+    openLoginModal();
 }
 
-// Add this to your DOMContentLoaded event listener
-document.addEventListener('DOMContentLoaded', () => {
-    // ...existing code...
-    loadResources();
-    
-    // Refresh resources every 5 minutes
-    setInterval(loadResources, 300000);
+// Add authentication check on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+        // User is already logged in
+        if (window.location.pathname.includes('index.html')) {
+            // Already on home page, do nothing
+        } else {
+            // Redirect to home page
+            window.location.href = 'index.html';
+        }
+    }
 });
-
         // Close modal when clicking outside
         window.onclick = function(event) {
             const paymentModal = document.getElementById('paymentModal');
             const contactModal = document.getElementById('contactModal');
             const loginModal = document.getElementById('loginModal');
             const signupModal = document.getElementById('signupModal');
+            const resetModal = document.getElementById('resetModal');
             const faqModal = document.getElementById('faqModal');
             const privacyModal = document.getElementById('privacyModal');
             const termsModal = document.getElementById('termsModal');
@@ -1603,6 +1593,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (event.target === signupModal) {
                 closeSignupModal();
+            }
+            if (event.target === resetModal) {
+                closeResetModal();
             }
             if (event.target === faqModal) {
                 closeFaqModal();
