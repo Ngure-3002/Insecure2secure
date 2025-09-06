@@ -262,63 +262,7 @@
         }
         
         /* Customer Care Styles */
-        .contact-stats {
-            display: flex;
-            gap: 20px;
-        }
-
-        .contact-stats span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.9rem;
-            color: var(--dark);
-        }
-
-        .contact-stats i {
-            color: var(--primary);
-        }
-
-        .inquiry-tabs {
-            margin: 20px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tab-btn {
-            padding: 10px 20px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            color: var(--dark);
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-btn:hover {
-            color: var(--primary);
-        }
-
-        /* Status colors for inquiries */
-        .status-new {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .status-inprogress {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .status-resolved {
-            background: #e8f5e9;
-            color: #388e3c;
-        }
+        /* Removed customer care styles as per the code change request */
         
         /* Loading State */
         .loading-state {
@@ -500,6 +444,10 @@
             margin-bottom: 20px;
         }
 
+        .user-info p {
+            margin: 5px 0;
+        }
+
         .access-duration {
             margin: 20px 0;
         }
@@ -518,6 +466,22 @@
             background: #e9ecef;
             color: #6c757d;
         }
+
+        /* Add to your existing styles */
+        .btn-access {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-access:hover {
+            background: #5a4abc;
+        }
+
+        #accessPackage {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -528,10 +492,9 @@
             <div class="logo-text">Insecure2Secure</div>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#paymentsSection" onclick="scrollToPayments(event)"><i class="fas fa-money-bill-wave"></i> Payments</a></li>
+            <li><a href="#recentPaymentsSection" onclick="scrollToPayments(event)"><i class="fas fa-money-bill-wave"></i> Payments</a></li>
             <li><a href="#usersSection" onclick="scrollToUsers(event)"><i class="fas fa-users"></i> Users</a></li>
             <li><a href="#contentSection" onclick="scrollToContent(event)"><i class="fas fa-file-upload"></i> Content</a></li>
-            <li><a href="#customerCareSection" onclick="scrollToCustomerCare(event)"><i class="fas fa-headset"></i> Customer Care</a></li>
             <li><a href="index.html"><i class="fas fa-globe"></i> View Website</a></li>
             <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
@@ -573,33 +536,6 @@
                     <i class="fas fa-spinner fa-spin"></i>
                 </div>
             </div>
-        </div>
-
-        <!-- Recent Payments Table -->
-        <div class="table-section" id="paymentsSection">
-            <div class="section-header">
-                <div class="section-title">Recent Payments</div>
-                <button class="btn btn-primary" onclick="exportPaymentsReport()">Export Report</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Plan</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="recentPaymentsTable">
-                    <tr>
-                        <td colspan="6" class="loading-state">
-                            <i class="fas fa-spinner fa-spin"></i> Loading payments...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
 
         <!-- User Management Table -->
@@ -689,53 +625,53 @@
                     </tr>
                 </thead>
                 <tbody id="contentTable">
-                    <tr>
-                        <td colspan="6" class="loading-state">
-                            <i class="fas fa-spinner fa-spin"></i> Loading content...
-                        </td>
-                    </tr>
+                    <!-- Content will be loaded here -->
                 </tbody>
             </table>
-        </div>
 
-        <!-- Customer Care Section -->
-        <div class="table-section" id="customerCareSection">
-            <div class="section-header">
-                <div class="section-title">Customer Inquiries</div>
-                <div class="contact-stats">
-                    <span><i class="fas fa-phone"></i> Active Calls: <span id="activeCallsCount">0</span></span>
-                    <span><i class="fas fa-envelope"></i> Unread Emails: <span id="unreadEmailsCount">0</span></span>
-                    <span><i class="fab fa-whatsapp"></i> WhatsApp Messages: <span id="whatsappCount">0</span></span>
+            <!-- Add Edit Content Modal -->
+            <div id="editContentModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Edit Content</h2>
+                        <span class="close" onclick="closeEditContentModal()">&times;</span>
+                    </div>
+                    <form id="editContentForm">
+                        <input type="hidden" id="editContentId">
+                        <div class="form-group">
+                            <label for="editContentTitle">Title</label>
+                            <input type="text" id="editContentTitle" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editContentType">Content Type</label>
+                            <select id="editContentType" class="form-control" required>
+                                <option value="video">Video</option>
+                                <option value="pdf">PDF Document</option>
+                                <option value="audio">Audio</option>
+                                <option value="article">Article</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editContentDescription">Description</label>
+                            <textarea id="editContentDescription" class="form-control" rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Content</button>
+                    </form>
                 </div>
             </div>
 
-            <!-- Inquiry Tabs -->
-            <div class="inquiry-tabs">
-                <button class="tab-btn active" onclick="switchTab('all')">All Inquiries</button>
-                <button class="tab-btn" onclick="switchTab('calls')">Phone Calls</button>
-                <button class="tab-btn" onclick="switchTab('emails')">Emails</button>
-                <button class="tab-btn" onclick="switchTab('whatsapp')">WhatsApp</button>
+            <!-- Add View Content Modal -->
+            <div id="viewContentModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Content Details</h2>
+                        <span class="close" onclick="closeViewContentModal()">&times;</span>
+                    </div>
+                    <div class="modal-body" id="contentDetails">
+                        <!-- Content details will be loaded here -->
+                    </div>
+                </div>
             </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Customer</th>
-                        <th>Subject</th>
-                        <th>Received</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="inquiriesTable">
-                    <tr>
-                        <td colspan="6" class="loading-state">
-                            <i class="fas fa-spinner fa-spin"></i> Loading inquiries...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
 
         <!-- Marketing Materials Section -->
@@ -845,12 +781,110 @@
                         <th>Plan</th>
                         <th>Amount</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="recentPaymentsTable">
                     <!-- Recent payments will be loaded here -->
                 </tbody>
             </table>
+        </div>
+
+        <!-- Add view transaction modal -->
+        <div id="viewTransactionModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Transaction Details</h2>
+                    <span class="close" onclick="closeViewTransactionModal()">&times;</span>
+                </div>
+                <div class="modal-body" id="transactionDetails">
+                    <!-- Transaction details will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Add View Recent Payment Modal -->
+        <div id="viewRecentPaymentModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Payment Details</h2>
+                    <span class="close" onclick="closeViewRecentPaymentModal()">&times;</span>
+                </div>
+                <div class="modal-body" id="recentPaymentDetails">
+                    <!-- Recent payment details will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Edit Recent Payment Modal -->
+        <div id="editRecentPaymentModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Edit Payment Details</h2>
+                    <span class="close" onclick="closeEditRecentPaymentModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="editPaymentForm">
+                        <input type="hidden" id="editPaymentCode">
+                        <div class="form-group">
+                            <label for="editPaymentPlan">Plan</label>
+                            <select id="editPaymentPlan" class="form-control" required>
+                                <option value="Hourly">Hourly</option>
+                                <option value="Daily">Daily</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Annual">Annual</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPaymentAmount">Amount</label>
+                            <input type="text" id="editPaymentAmount" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Payment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add User Details Modal -->
+        <div id="viewUserModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>User Details</h2>
+                    <span class="close" onclick="closeViewUserModal()">&times;</span>
+                </div>
+                <div class="modal-body" id="userDetails">
+                    <!-- User details will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Edit User Modal -->
+        <div id="editUserModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Edit User</h2>
+                    <span class="close" onclick="closeEditUserModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+                        <div class="form-group">
+                            <label for="editUserName">Full Name</label>
+                            <input type="text" id="editUserName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editUserEmail">Email</label>
+                            <input type="email" id="editUserEmail" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editUserPhone">Phone</label>
+                            <input type="tel" id="editUserPhone" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update User</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -895,46 +929,27 @@
                 data.totalContent.toLocaleString();
         }
 
-        // Fetch recent payments data
-        async function fetchRecentPayments() {
-            try {
-                const response = await fetch('https://api.insecure2secure.com/api/payments/recent');
-                if (!response.ok) throw new Error('Failed to fetch payments');
-                const payments = await response.json();
-                displayRecentPayments(payments);
-            } catch (error) {
-                console.error('Error fetching payments:', error);
-                showPaymentsError();
-            }
-        }
+        // Add this function to update dashboard cards
+        function updateDashboardCards() {
+            // Update Total Users
+            const users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            document.querySelector('#totalUsersCard .card-value').innerHTML = users.length;
 
-        // Display recent payments in the table
-        function displayRecentPayments(payments) {
-            const tbody = document.getElementById('recentPaymentsTable');
-            tbody.innerHTML = payments.map(payment => `
-                <tr>
-                    <td>${escapeHtml(payment.userName)}</td>
-                    <td>${escapeHtml(payment.planName)}</td>
-                    <td>$${parseFloat(payment.amount).toFixed(2)}</td>
-                    <td>${new Date(payment.date).toLocaleString('en-US')}</td>
-                    <td><span class="status status-${payment.status.toLowerCase()}">${escapeHtml(payment.status)}</span></td>
-                    <td>
-                        <button class="action-btn btn-edit" onclick="viewPaymentDetails('${payment.id}')">View</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+            // Update Active Subscriptions
+            const activeSubscriptions = users.filter(user => {
+                if (!user.accessEndTime) return false;
+                return new Date(user.accessEndTime) > new Date();
+            }).length;
+            document.querySelector('#activeSubsCard .card-value').innerHTML = activeSubscriptions;
 
-        // Show error state if payments fetch fails
-        function showPaymentsError() {
-            const tbody = document.getElementById('recentPaymentsTable');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="color: var(--danger); text-align: center;">
-                        Failed to load payment data. Please try again later.
-                    </td>
-                </tr>
-            `;
+            // Update Pending Payments
+            const pendingPayments = JSON.parse(localStorage.getItem('pendingPayments') || '[]')
+                .filter(payment => payment.status === 'pending').length;
+            document.querySelector('#pendingPaymentsCard .card-value').innerHTML = pendingPayments;
+
+            // Update Total Content
+            const content = JSON.parse(localStorage.getItem('siteContent') || '[]').length;
+            document.querySelector('#totalContentCard .card-value').innerHTML = content;
         }
 
         // Fetch users data
@@ -959,7 +974,7 @@
             tableBody.innerHTML = users.map(user => {
                 const timeRemaining = calculateTimeRemaining(user.accessEndTime);
                 const status = determineUserStatus(user.accessEndTime);
-                
+        
                 return `
                     <tr>
                         <td>${escapeHtml(user.fullName)}</td>
@@ -967,21 +982,30 @@
                         <td>${escapeHtml(user.phone)}</td>
                         <td>${new Date(user.signupDate).toLocaleString()}</td>
                         <td>${new Date(user.lastLogin).toLocaleString()}</td>
-                        <td>${escapeHtml(user.subscriptionPlan)}</td>
+                        <td>${escapeHtml(user.subscriptionPlan || 'None')}</td>
                         <td>${user.accessEndTime ? new Date(user.accessEndTime).toLocaleString() : 'No subscription'}</td>
                         <td>${timeRemaining}</td>
                         <td><span class="status-${status.toLowerCase()}">${status}</span></td>
                         <td>
-                            <button class="action-btn btn-view" onclick="viewUserDetails('${user.id}')">
-                                <i class="fas fa-eye"></i> View
+                            <button class="action-btn btn-view" onclick="viewUser('${user.id}')">
+                                <i class="fas fa-eye"></i>
                             </button>
-                            <button class="action-btn btn-edit" onclick="manageAccess('${user.id}')">
-                                <i class="fas fa-clock"></i> Manage Access
+                            <button class="action-btn btn-edit" onclick="editUser('${user.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn btn-delete" onclick="deleteUser('${user.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="action-btn btn-access" onclick="manageAccess('${user.id}')">
+                                <i class="fas fa-clock"></i>
                             </button>
                         </td>
                     </tr>
                 `;
             }).join('');
+        
+            // Update dashboard cards whenever users table is updated
+            updateDashboardCards();
         }
 
         // Refresh user table every minute
@@ -1020,31 +1044,33 @@
             const modalHTML = `
                 <div id="accessModal" class="modal">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h2>Manage User Access</h2>
-                            <span class="close" onclick="closeAccessModal()">&times;</span>
-                        </div>
-                        <div class="modal-body">
-                            <div class="user-info">
-                                <p><strong>User:</strong> ${escapeHtml(user.fullName)}</p>
-                                <p><strong>Current Plan:</strong> ${escapeHtml(user.subscriptionPlan || 'None')}</p>
-                            </div>
-                            <form id="accessForm" onsubmit="setUserAccess(event, '${userId}')">
-                                <div class="form-group">
-                                    <label>Select Access Duration:</label>
-                                    <select id="accessDuration" class="form-control" required>
-                                        <option value="60">60 Minutes Access</option>
-                                        <option value="1440">24 Hours Access</option>
-                                        <option value="2880">2 Days Access</option>
-                                        <option value="43200">30 Days Access</option>
-                                        <option value="525600">12 Months Access</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Set Access Time</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                         <div class="modal-header">
+                             <h2>Manage User Access</h2>
+                             <span class="close" onclick="closeAccessModal()">&times;</span>
+                         </div>
+                         <div class="modal-body">
+                             <div class="user-info">
+                                 <p><strong>User:</strong> ${escapeHtml(user.fullName)}</p>
+                                 <p><strong>Current Plan:</strong> ${escapeHtml(user.subscriptionPlan || 'None')}</p>
+                                 <p><strong>Access Until:</strong> ${user.accessEndTime ? new Date(user.accessEndTime).toLocaleString() : 'No active subscription'}</p>
+                             </div>
+                             <form id="accessForm" onsubmit="setUserAccess(event, '${userId}')">
+                                 <div class="form-group">
+                                     <label>Select Access Package:</label>
+                                     <select id="accessPackage" class="form-control" required>
+                                         <option value="">Choose a package</option>
+                                         <option value="60|20|hourly">60 Minutes Access (KES 20)</option>
+                                         <option value="1440|100|daily">24 Hours Access (KES 100)</option>
+                                         <option value="10080|500|weekly">7 Days Access (KES 500)</option>
+                                         <option value="43200|1800|monthly">30 Days Access (KES 1,800)</option>
+                                         <option value="525600|24000|annual">1 Year Access (KES 24,000)</option>
+                                     </select>
+                                 </div>
+                                 <button type="submit" class="btn btn-primary">Set Access Time</button>
+                             </form>
+                         </div>
+                     </div>
+                 </div>
             `;
 
             document.body.insertAdjacentHTML('beforeend', modalHTML);
@@ -1053,27 +1079,35 @@
 
         function setUserAccess(event, userId) {
             event.preventDefault();
-            
-            const minutes = parseInt(document.getElementById('accessDuration').value);
+    
+            const packageValue = document.getElementById('accessPackage').value;
+            if (!packageValue) return;
+
+            const [minutes, amount, plan] = packageValue.split('|');
             const users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
             const userIndex = users.findIndex(u => u.id === userId);
-            
+    
             if (userIndex === -1) return;
-            
+    
             const now = new Date();
             users[userIndex].accessEndTime = new Date(now.getTime() + minutes * 60000).toISOString();
-            users[userIndex].subscriptionPlan = getSubscriptionPlanFromMinutes(minutes);
-            
+            users[userIndex].subscriptionPlan = plan.charAt(0).toUpperCase() + plan.slice(1);
+            users[userIndex].lastPayment = {
+                amount: parseInt(amount),
+                date: now.toISOString(),
+                plan: plan
+            };
+    
             localStorage.setItem('i2s_users', JSON.stringify(users));
             closeAccessModal();
-            displayUsers(users);
+            displayUsers();
+            updateDashboardCards();
         }
 
         function getSubscriptionPlanFromMinutes(minutes) {
             switch(minutes) {
                 case 60: return 'Hourly';
                 case 1440: return 'Daily';
-                case 2880: return '2-Day';
                 case 43200: return 'Monthly';
                 case 525600: return 'Annual';
                 default: return 'Custom';
@@ -1098,36 +1132,37 @@
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const formData = new FormData();
-            formData.append('title', document.getElementById('contentTitle').value);
-            formData.append('type', document.getElementById('contentType').value);
-            formData.append('file', document.getElementById('contentFile').files[0]);
-            formData.append('description', document.getElementById('contentDescription').value);
+            const file = handleFileUpload(document.getElementById('contentFile'));
+            if (!file) return;
 
-            try {
-                const response = await fetch('https://api.insecure2secure.com/api/content/upload', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${getAuthToken()}`
-                    },
-                    body: formData
-                });
+            const content = {
+                id: 'content_' + Date.now(),
+                title: document.getElementById('contentTitle').value,
+                type: document.getElementById('contentType').value,
+                fileName: file.name,
+                size: file.size,
+                description: document.getElementById('contentDescription').value,
+                uploadDate: new Date().toISOString(),
+                views: 0
+            };
 
-                if (!response.ok) throw new Error('Upload failed');
+            // Store content metadata
+            let siteContent = JSON.parse(localStorage.getItem('siteContent') || '[]');
+            siteContent.push(content);
+            localStorage.setItem('siteContent', JSON.stringify(siteContent));
+
+            // Store file using FileReader
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let files = JSON.parse(localStorage.getItem('contentFiles') || '{}');
+                files[content.id] = e.target.result;
+                localStorage.setItem('contentFiles', JSON.stringify(files));
                 
-                // Notify success
-                alert('Content uploaded successfully!');
-                
-                // Close modal and refresh content
                 closeUploadModal();
-                fetchContent();
-                
-                // Update public resources cache
-                localStorage.setItem('resourcesLastUpdate', Date.now());
-            } catch (error) {
-                console.error('Error uploading content:', error);
-                alert('Failed to upload content. Please try again later.');
-            }
+                displayContent();
+                updateDashboardCards();
+            };
+            reader.readAsDataURL(file);
         });
 
         // Escape HTML helper function
@@ -1140,11 +1175,26 @@
         // Scroll to payments section
         function scrollToPayments(event) {
             event.preventDefault();
-            const paymentsSection = document.getElementById('paymentsSection');
+            const paymentsSection = document.getElementById('recentPaymentsSection');
+            const transactionSection = document.getElementById('transactionSection');
+            
+            // Scroll to Recent Payments section
             paymentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             
-            // Highlight the section briefly
+            // Highlight both sections briefly
+            paymentsSection.style.animation = 'none';
+            transactionSection.style.animation = 'none';
+            
+            // Trigger reflow
+            paymentsSection.offsetHeight;
+            transactionSection.offsetHeight;
+            
+            // Add highlight animation
             paymentsSection.style.animation = 'highlightSection 2s';
+            transactionSection.style.animation = 'highlightSection 2s';
+            
+            // Load/refresh the payment data
+            loadTransactions();
         }
 
         // Scroll to users section
@@ -1169,97 +1219,6 @@
             contentSection.style.animation = 'none';
             contentSection.offsetHeight; // Trigger reflow
             contentSection.style.animation = 'highlightSection 2s';
-        }
-
-        // Customer Care Functions
-        function scrollToCustomerCare(event) {
-            event.preventDefault();
-            const customerCareSection = document.getElementById('customerCareSection');
-            customerCareSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            customerCareSection.style.animation = 'highlightSection 2s';
-        }
-
-        async function fetchInquiries(type = 'all') {
-            try {
-                const response = await fetch(`https://api.insecure2secure.com/api/inquiries?type=${type}`);
-                if (!response.ok) throw new Error('Failed to fetch inquiries');
-                const inquiries = await response.json();
-                displayInquiries(inquiries);
-                updateInquiryCounts(inquiries);
-            } catch (error) {
-                console.error('Error fetching inquiries:', error);
-                showInquiriesError();
-            }
-        }
-
-        function displayInquiries(inquiries) {
-            const tbody = document.getElementById('inquiriesTable');
-            tbody.innerHTML = inquiries.map(inquiry => `
-                <tr>
-                    <td>
-                        <i class="fas ${getInquiryIcon(inquiry.type)}" title="${inquiry.type}"></i>
-                        ${escapeHtml(inquiry.type)}
-                    </td>
-                    <td>${escapeHtml(inquiry.customerName)}</td>
-                    <td>${escapeHtml(inquiry.subject)}</td>
-                    <td>${new Date(inquiry.receivedDate).toLocaleString('en-GB')}</td>
-                    <td><span class="status status-${inquiry.status.toLowerCase()}">${escapeHtml(inquiry.status)}</span></td>
-                    <td>
-                        <button class="action-btn btn-view" onclick="viewInquiry('${inquiry.id}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        <button class="action-btn btn-edit" onclick="respondToInquiry('${inquiry.id}')">
-                            <i class="fas fa-reply"></i> Respond
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function getInquiryIcon(type) {
-            switch(type.toLowerCase()) {
-                case 'call': return 'fa-phone';
-                case 'email': return 'fa-envelope';
-                case 'whatsapp': return 'fa-whatsapp';
-                default: return 'fa-message';
-            }
-        }
-
-        function updateInquiryCounts(inquiries) {
-            document.getElementById('activeCallsCount').textContent = 
-                inquiries.filter(i => i.type === 'call' && i.status === 'new').length;
-            document.getElementById('unreadEmailsCount').textContent = 
-                inquiries.filter(i => i.type === 'email' && i.status === 'new').length;
-            document.getElementById('whatsappCount').textContent = 
-                inquiries.filter(i => i.type === 'whatsapp' && i.status === 'new').length;
-        }
-
-        function switchTab(type) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            fetchInquiries(type);
-        }
-
-        async function viewInquiry(inquiryId) {
-            try {
-                const response = await fetch(`https://api.insecure2secure.com/api/inquiries/${inquiryId}`);
-                if (!response.ok) throw new Error('Failed to fetch inquiry details');
-                const inquiry = await response.json();
-                showInquiryModal(inquiry);
-            } catch (error) {
-                console.error('Error fetching inquiry details:', error);
-                alert('Failed to load inquiry details. Please try again later.');
-            }
-        }
-
-        function openUploadModal() {
-            document.getElementById('marketingUploadModal').style.display = 'flex';
-        }
-
-        function closeUploadModal() {
-            document.getElementById('marketingUploadModal').style.display = 'none';
         }
 
         // Initialize marketing materials handling
@@ -1362,15 +1321,6 @@
             const transactions = JSON.parse(localStorage.getItem('pendingPayments') || '[]');
             const tableBody = document.getElementById('transactionTable');
             
-            if (transactions.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center">No pending transactions</td>
-                    </tr>
-                `;
-                return;
-            }
-
             tableBody.innerHTML = transactions.map(tx => `
                 <tr>
                     <td>${new Date(tx.timestamp).toLocaleString()}</td>
@@ -1380,12 +1330,18 @@
                     <td>${tx.amount}</td>
                     <td><span class="status-${tx.status.toLowerCase()}">${tx.status}</span></td>
                     <td>
+                        <button class="action-btn btn-view" onclick="viewTransaction('${tx.mpesaCode}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
                         ${tx.status === 'pending' ? `
                             <button class="action-btn btn-approve" onclick="handleTransaction('${tx.mpesaCode}', 'approve')">
-                                <i class="fas fa-check"></i> Approve
+                                <i class="fas fa-check"></i>
                             </button>
                             <button class="action-btn btn-reject" onclick="handleTransaction('${tx.mpesaCode}', 'reject')">
-                                <i class="fas fa-times"></i> Reject
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="action-btn btn-delete" onclick="deleteTransaction('${tx.mpesaCode}')">
+                                <i class="fas fa-trash"></i>
                             </button>
                         ` : ''}
                     </td>
@@ -1428,12 +1384,367 @@
             loadTransactions();
         }
 
-        // Make sure this is called when the dashboard loads
-        document.addEventListener('DOMContentLoaded', function() {
+        // Add these functions to your existing script section
+        function displayContent() {
+            const content = JSON.parse(localStorage.getItem('siteContent') || '[]');
+            const tableBody = document.getElementById('contentTable');
+            
+            tableBody.innerHTML = content.map(item => `
+                <tr>
+                    <td>${escapeHtml(item.title)}</td>
+                    <td>${escapeHtml(item.type)}</td>
+                    <td>${new Date(item.uploadDate).toLocaleString()}</td>
+                    <td>${formatFileSize(item.size)}</td>
+                    <td>${item.views}</td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewContent('${item.id}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn btn-edit" onclick="editContent('${item.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn btn-delete" onclick="deleteContent('${item.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewContent(contentId) {
+            const content = JSON.parse(localStorage.getItem('siteContent') || '[]');
+            const item = content.find(c => c.id === contentId);
+            
+            if (!item) return;
+            
+            document.getElementById('contentDetails').innerHTML = `
+                <div class="content-info">
+                    <p><strong>Title:</strong> ${escapeHtml(item.title)}</p>
+                    <p><strong>Type:</strong> ${escapeHtml(item.type)}</p>
+                    <p><strong>Description:</strong> ${escapeHtml(item.description)}</p>
+                    <p><strong>Upload Date:</strong> ${new Date(item.uploadDate).toLocaleString()}</p>
+                    <p><strong>Size:</strong> ${formatFileSize(item.size)}</p>
+                    <p><strong>Views:</strong> ${item.views}</p>
+                </div>
+            `;
+            
+            document.getElementById('viewContentModal').style.display = 'block';
+        }
+
+        function editContent(contentId) {
+            const content = JSON.parse(localStorage.getItem('siteContent') || '[]');
+            const item = content.find(c => c.id === contentId);
+            
+            if (!item) return;
+            
+            document.getElementById('editContentId').value = item.id;
+            document.getElementById('editContentTitle').value = item.title;
+            document.getElementById('editContentType').value = item.type;
+            document.getElementById('editContentDescription').value = item.description;
+            
+            document.getElementById('editContentModal').style.display = 'block';
+        }
+
+        function deleteContent(contentId) {
+            if (!confirm('Are you sure you want to delete this content?')) return;
+            
+            let content = JSON.parse(localStorage.getItem('siteContent') || '[]');
+            content = content.filter(c => c.id !== contentId);
+            localStorage.setItem('siteContent', JSON.stringify(content));
+            displayContent();
+        }
+
+        function viewTransaction(mpesaCode) {
+            const transactions = JSON.parse(localStorage.getItem('pendingPayments') || '[]');
+            const transaction = transactions.find(tx => tx.mpesaCode === mpesaCode);
+            
+            if (!transaction) return;
+            
+            document.getElementById('transactionDetails').innerHTML = `
+                <div class="transaction-info">
+                    <p><strong>Transaction Code:</strong> ${transaction.mpesaCode}</p>
+                    <p><strong>Phone Number:</strong> ${transaction.phoneNumber}</p>
+                    <p><strong>Plan:</strong> ${transaction.plan}</p>
+                    <p><strong>Amount:</strong> ${transaction.amount}</p>
+                    <p><strong>Date:</strong> ${new Date(transaction.timestamp).toLocaleString()}</p>
+                    <p><strong>Status:</strong> <span class="status-${transaction.status.toLowerCase()}">${transaction.status}</span></p>
+                </div>
+            `;
+            
+            document.getElementById('viewTransactionModal').style.display = 'block';
+        }
+
+        function closeViewTransactionModal() {
+            document.getElementById('viewTransactionModal').style.display = 'none';
+        }
+
+        function deleteTransaction(mpesaCode) {
+            if (!confirm('Are you sure you want to delete this transaction?')) return;
+            
+            let transactions = JSON.parse(localStorage.getItem('pendingPayments') || '[]');
+            transactions = transactions.filter(tx => tx.mpesaCode !== mpesaCode);
+            localStorage.setItem('pendingPayments', JSON.stringify(transactions));
             loadTransactions();
-            // Set up auto-refresh every 30 seconds
-            setInterval(loadTransactions, 30000);
+        }
+
+        // Load recent payments data
+        function loadRecentPayments() {
+            const recentPayments = JSON.parse(localStorage.getItem('recentPayments') || '[]');
+            const tableBody = document.getElementById('recentPaymentsTable');
+            
+            if (recentPayments.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center">No recent payments found</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = recentPayments.map(payment => `
+                <tr>
+                    <td>${new Date(payment.timestamp).toLocaleString()}</td>
+                    <td>${payment.mpesaCode}</td>
+                    <td>${payment.phoneNumber}</td>
+                    <td>${payment.plan}</td>
+                    <td>${payment.amount}</td>
+                    <td><span class="status-${payment.status.toLowerCase()}">${payment.status}</span></td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewRecentPayment('${payment.mpesaCode}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn btn-edit" onclick="editRecentPayment('${payment.mpesaCode}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn btn-delete" onclick="deleteRecentPayment('${payment.mpesaCode}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewRecentPayment(mpesaCode) {
+            const payments = JSON.parse(localStorage.getItem('recentPayments') || '[]');
+            const payment = payments.find(p => p.mpesaCode === mpesaCode);
+            
+            if (!payment) return;
+            
+            document.getElementById('recentPaymentDetails').innerHTML = `
+                <div class="payment-info">
+                    <p><strong>Transaction Code:</strong> ${payment.mpesaCode}</p>
+                    <p><strong>Phone Number:</strong> ${payment.phoneNumber}</p>
+                    <p><strong>Plan:</strong> ${payment.plan}</p>
+                    <p><strong>Amount:</strong> ${payment.amount}</p>
+                    <p><strong>Date:</strong> ${new Date(payment.timestamp).toLocaleString()}</p>
+                    <p><strong>Status:</strong> <span class="status-${payment.status.toLowerCase()}">${payment.status}</span></p>
+                </div>
+            `;
+            
+            document.getElementById('viewRecentPaymentModal').style.display = 'block';
+        }
+
+        function editRecentPayment(mpesaCode) {
+            const payments = JSON.parse(localStorage.getItem('recentPayments') || '[]');
+            const payment = payments.find(p => p.mpesaCode === mpesaCode);
+            
+            if (!payment) return;
+            
+            document.getElementById('editPaymentCode').value = payment.mpesaCode;
+            document.getElementById('editPaymentPlan').value = payment.plan;
+            document.getElementById('editPaymentAmount').value = payment.amount;
+            
+            document.getElementById('editRecentPaymentModal').style.display = 'block';
+        }
+
+        function deleteRecentPayment(mpesaCode) {
+            if (!confirm('Are you sure you want to delete this payment record?')) return;
+            
+            let payments = JSON.parse(localStorage.getItem('recentPayments') || '[]');
+            payments = payments.filter(p => p.mpesaCode !== mpesaCode);
+            localStorage.setItem('recentPayments', JSON.stringify(payments));
+            loadRecentPayments();
+        }
+
+        // Add form submission handler for editing payment
+        document.getElementById('editPaymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const mpesaCode = document.getElementById('editPaymentCode').value;
+            const newPlan = document.getElementById('editPaymentPlan').value;
+            const newAmount = document.getElementById('editPaymentAmount').value;
+            
+            let payments = JSON.parse(localStorage.getItem('recentPayments') || '[]');
+            payments = payments.map(p => {
+                if (p.mpesaCode === mpesaCode) {
+                    p.plan = newPlan;
+                    p.amount = newAmount;
+                }
+                return p;
+            });
+            
+            localStorage.setItem('recentPayments', JSON.stringify(payments));
+            closeEditRecentPaymentModal();
+            loadRecentPayments();
         });
+
+        // Add automatic refresh for dashboard cards
+        setInterval(() => {
+            updateDashboardCards();
+        }, 30000); // Updates every 30 seconds
+
+        // Initialize dashboard cards on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDashboardCards();
+        });
+
+        // Add to your existing script section
+        function handleFileUpload(fileInput, maxSize = 50 * 1024 * 1024) { // 50MB max
+            const file = fileInput.files[0];
+            if (!file) return null;
+
+            // Check file size
+            if (file.size > maxSize) {
+                alert('File is too large. Maximum size is ' + formatFileSize(maxSize));
+                return null;
+            }
+
+            return file;
+        }
+
+        // Update the content upload form
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const file = handleFileUpload(document.getElementById('contentFile'));
+            if (!file) return;
+
+            const content = {
+                id: 'content_' + Date.now(),
+                title: document.getElementById('contentTitle').value,
+                type: document.getElementById('contentType').value,
+                fileName: file.name,
+                size: file.size,
+                description: document.getElementById('contentDescription').value,
+                uploadDate: new Date().toISOString(),
+                views: 0
+            };
+
+            // Store content metadata
+            let siteContent = JSON.parse(localStorage.getItem('siteContent') || '[]');
+            siteContent.push(content);
+            localStorage.setItem('siteContent', JSON.stringify(siteContent));
+
+            // Store file using FileReader
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let files = JSON.parse(localStorage.getItem('contentFiles') || '{}');
+                files[content.id] = e.target.result;
+                localStorage.setItem('contentFiles', JSON.stringify(files));
+                
+                closeUploadModal();
+                displayContent();
+                updateDashboardCards();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Add these user management functions
+        function viewUser(userId) {
+            const users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            const user = users.find(u => u.id === userId);
+            
+            if (!user) return;
+            
+            document.getElementById('userDetails').innerHTML = `
+                <div class="user-info">
+                    <p><strong>Name:</strong> ${escapeHtml(user.fullName)}</p>
+                    <p><strong>Email:</strong> ${escapeHtml(user.email)}</p>
+                    <p><strong>Phone:</strong> ${escapeHtml(user.phone)}</p>
+                    <p><strong>Signup Date:</strong> ${new Date(user.signupDate).toLocaleString()}</p>
+                    <p><strong>Last Login:</strong> ${new Date(user.lastLogin).toLocaleString()}</p>
+                    <p><strong>Subscription Plan:</strong> ${escapeHtml(user.subscriptionPlan)}</p>
+                    <p><strong>Access Until:</strong> ${user.accessEndTime ? new Date(user.accessEndTime).toLocaleString() : 'No subscription'}</p>
+                    <p><strong>Status:</strong> <span class="status-${determineUserStatus(user.accessEndTime).toLowerCase()}">${determineUserStatus(user.accessEndTime)}</span></p>
+                </div>
+            `;
+            
+            document.getElementById('viewUserModal').style.display = 'block';
+        }
+
+        function editUser(userId) {
+            const users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            const user = users.find(u => u.id === userId);
+            
+            if (!user) return;
+            
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUserName').value = user.fullName;
+            document.getElementById('editUserEmail').value = user.email;
+            document.getElementById('editUserPhone').value = user.phone;
+            
+            document.getElementById('editUserModal').style.display = 'block';
+        }
+
+        function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user?')) return;
+            
+            let users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            users = users.filter(u => u.id !== userId);
+            localStorage.setItem('i2s_users', JSON.stringify(users));
+            displayUsers();
+            updateDashboardCards();
+        }
+
+        // Add form submission handler for editing user
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById('editUserId').value;
+            let users = JSON.parse(localStorage.getItem('i2s_users') || '[]');
+            
+            users = users.map(u => {
+                if (u.id === userId) {
+                    return {
+                        ...u,
+                        fullName: document.getElementById('editUserName').value,
+                        email: document.getElementById('editUserEmail').value,
+                        phone: document.getElementById('editUserPhone').value
+                    };
+                }
+                return u;
+            });
+            
+            localStorage.setItem('i2s_users', JSON.stringify(users));
+            closeEditUserModal();
+            displayUsers();
+        });
+
+        function closeViewUserModal() {
+            document.getElementById('viewUserModal').style.display = 'none';
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileIcon(type) {
+            switch(type) {
+                case 'video': return 'fas fa-video';
+                case 'pdf': return 'fas fa-file-pdf';
+                case 'audio': return 'fas fa-music';
+                case 'article': return 'fas fa-file-alt';
+                default: return 'fas fa-file';
+            }
+        }
     </script>
 </body>
 </html>
